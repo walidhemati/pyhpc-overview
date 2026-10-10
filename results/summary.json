@@ -26,7 +26,7 @@
   },
   "pymd": {
    "file": "pymd/results/rtx3070-laptop.json",
-   "commit": "e99eb7c"
+   "commit": "3f267c6"
   },
   "pyspectral": {
    "file": "pyspectral/results/rtx3070-laptop.json",
@@ -34,7 +34,7 @@
   },
   "pyising": {
    "file": "pyising/results/rtx3070-laptop.json",
-   "commit": "5f05169"
+   "commit": "72d7e06"
   }
  },
  "ceilings": {
@@ -408,12 +408,12 @@
     {
      "code": "HOOMD-blue",
      "variant": "gpu-single",
-     "pct": 34.4,
+     "pct": 35.0,
      "size": [
-      1048576
+      4000000
      ],
      "conversion": "ratio",
-     "rate": 359318155.06837267,
+     "rate": 364280575.0656407,
      "tuning_complete": true
     },
     {
