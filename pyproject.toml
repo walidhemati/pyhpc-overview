@@ -1,0 +1,15 @@
+[project]
+name = "pyhpc-overview"
+version = "0.1.0"
+description = "Overview of the python-hpc suite: six GPU workloads against their rooflines and established codes"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Walid Hemati" }]
+dependencies = ["numpy", "matplotlib"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "NPY"]

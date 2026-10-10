@@ -1,0 +1,463 @@
+{
+ "machine": {
+  "gpu": "NVIDIA GeForce RTX 3070 Laptop GPU",
+  "python": "3.13.2",
+  "torch": "2.7.0+cu126",
+  "date": "2026-10-10T02:16:49+00:00",
+  "triton": "3.3.0",
+  "warp": "1.18.0",
+  "cupy": "13.5.1",
+  "numba": "0.68.0",
+  "numpy": "2.5.3",
+  "driver": "595.91.07"
+ },
+ "sources": {
+  "pylbm": {
+   "file": "pylbm/results/rtx3070-laptop.json",
+   "commit": "7ec604d"
+  },
+  "pyheat3d": {
+   "file": "pyheat3d/results/rtx3070-laptop.json",
+   "commit": "e98f817"
+  },
+  "pygravity": {
+   "file": "pygravity/results/rtx3070-laptop.json",
+   "commit": "1ffed51"
+  },
+  "pymd": {
+   "file": "pymd/results/rtx3070-laptop.json",
+   "commit": "4c32133"
+  },
+  "pyspectral": {
+   "file": "pyspectral/results/rtx3070-laptop.json",
+   "commit": "3a4c6a0"
+  },
+  "pyising": {
+   "file": "pyising/results/rtx3070-laptop.json",
+   "commit": "115ae4c"
+  }
+ },
+ "workloads": [
+  {
+   "repo": "pylbm",
+   "workload": "LBM D2Q9",
+   "bound": "memory",
+   "roofline": "copy bandwidth / minimal bytes per update",
+   "dsl": {
+    "backend": "numba",
+    "variant": "fused",
+    "size": [
+     4096,
+     4096
+    ],
+    "value": 5034.245098659364,
+    "metric": "MLUPS",
+    "pct": 100.5
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "roll",
+    "size": [
+     4096,
+     4096
+    ],
+    "value": 4983.07566668518,
+    "metric": "MLUPS",
+    "pct": 99.5
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "fused",
+    "size": [
+     4096,
+     4096
+    ],
+    "value": 5024.445252102786,
+    "metric": "MLUPS",
+    "pct": 100.3
+   },
+   "numpy": null,
+   "counterpart": null
+  },
+  {
+   "repo": "pylbm",
+   "workload": "LBM D3Q19",
+   "bound": "memory",
+   "roofline": "copy bandwidth / minimal bytes per update",
+   "dsl": {
+    "backend": "numba",
+    "variant": "fused",
+    "size": [
+     256,
+     256,
+     256
+    ],
+    "value": 2364.357768793185,
+    "metric": "MLUPS",
+    "pct": 99.7
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "roll",
+    "size": [
+     128,
+     128,
+     128
+    ],
+    "value": 1918.5022355110507,
+    "metric": "MLUPS",
+    "pct": 80.9
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "fused-aa",
+    "size": [
+     256,
+     256,
+     256
+    ],
+    "value": 2356.308247376832,
+    "metric": "MLUPS",
+    "pct": 99.3
+   },
+   "numpy": null,
+   "counterpart": null
+  },
+  {
+   "repo": "pyheat3d",
+   "workload": "heat 2D",
+   "bound": "memory",
+   "roofline": "copy bandwidth / 8 B per single-step update",
+   "dsl": {
+    "backend": "triton",
+    "variant": "tile",
+    "size": [
+     16384,
+     16384
+    ],
+    "value": 45073.37351436341,
+    "metric": "MLUPS",
+    "pct": 99.9
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "inductor",
+    "size": [
+     16384,
+     16384
+    ],
+    "value": 45543.430735694084,
+    "metric": "MLUPS",
+    "pct": 100.9
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "naive",
+    "size": [
+     16384,
+     16384
+    ],
+    "value": 43760.17308768313,
+    "metric": "MLUPS",
+    "pct": 97.0
+   },
+   "numpy": {
+    "backend": "numpy",
+    "variant": "slicing",
+    "size": [
+     4096,
+     4096
+    ],
+    "value": 496.37714682053274,
+    "metric": "MLUPS",
+    "pct": 1.1
+   },
+   "counterpart": null
+  },
+  {
+   "repo": "pyheat3d",
+   "workload": "heat 3D",
+   "bound": "memory",
+   "roofline": "copy bandwidth / 8 B per single-step update",
+   "dsl": {
+    "backend": "numba",
+    "variant": "zmarch",
+    "size": [
+     512,
+     512,
+     512
+    ],
+    "value": 40988.44809265975,
+    "metric": "MLUPS",
+    "pct": 90.8
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "inductor",
+    "size": [
+     512,
+     512,
+     512
+    ],
+    "value": 26241.90106749701,
+    "metric": "MLUPS",
+    "pct": 58.2
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "zmarch",
+    "size": [
+     512,
+     512,
+     512
+    ],
+    "value": 40063.97987454953,
+    "metric": "MLUPS",
+    "pct": 88.8
+   },
+   "numpy": {
+    "backend": "numpy",
+    "variant": "slicing",
+    "size": [
+     256,
+     256,
+     256
+    ],
+    "value": 270.76225961937325,
+    "metric": "MLUPS",
+    "pct": 0.6
+   },
+   "counterpart": null
+  },
+  {
+   "repo": "pygravity",
+   "workload": "N-body",
+   "bound": "compute",
+   "roofline": "measured FP32 FMA peak (20 flops per interaction)",
+   "dsl": {
+    "backend": "warp",
+    "variant": "tile-rsqrt",
+    "size": [
+     1048576
+    ],
+    "value": 404.2728310966656,
+    "metric": "Ginteractions/s",
+    "pct": 52.2
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "chunked",
+    "size": [
+     262144
+    ],
+    "value": 82.0704897166232,
+    "metric": "Ginteractions/s",
+    "pct": 10.6
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "tiled-ilp4",
+    "size": [
+     1048576
+    ],
+    "value": 415.2988389229131,
+    "metric": "Ginteractions/s",
+    "pct": 53.6
+   },
+   "numpy": {
+    "backend": "numpy",
+    "variant": "fp32",
+    "size": [
+     16384
+    ],
+    "value": 0.1071541813642216,
+    "metric": "Ginteractions/s",
+    "pct": 0.0
+   },
+   "counterpart": null
+  },
+  {
+   "repo": "pymd",
+   "workload": "LJ MD",
+   "bound": "memory",
+   "roofline": "copy bandwidth / minimal bytes per atom-step (lower bound)",
+   "dsl": {
+    "backend": "triton",
+    "variant": "full-fused",
+    "size": [
+     4000000
+    ],
+    "value": 423696777.4703836,
+    "metric": "atom-steps/s",
+    "pct": 40.8
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "gather",
+    "size": [
+     1048576
+    ],
+    "value": 51007870.0034798,
+    "metric": "atom-steps/s",
+    "pct": 4.9
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "full-fused",
+    "size": [
+     4000000
+    ],
+    "value": 469547032.24194586,
+    "metric": "atom-steps/s",
+    "pct": 45.2
+   },
+   "numpy": {
+    "backend": "numpy",
+    "variant": "cell-verlet",
+    "size": [
+     32000
+    ],
+    "value": 227495.50725692228,
+    "metric": "atom-steps/s",
+    "pct": 0.0
+   },
+   "counterpart": null
+  },
+  {
+   "repo": "pyspectral",
+   "workload": "spectral 2D",
+   "bound": "FFT",
+   "roofline": "cuFFT time for the step's transforms + pointwise traffic",
+   "dsl": {
+    "backend": "triton",
+    "variant": "fused",
+    "size": [
+     8192,
+     8192
+    ],
+    "value": 420.24151866424614,
+    "metric": "Mpts/s",
+    "pct": 75.9
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "inductor",
+    "size": [
+     8192,
+     8192
+    ],
+    "value": 383.3068260472972,
+    "metric": "Mpts/s",
+    "pct": 69.2
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "fused-inplace",
+    "size": [
+     8192,
+     8192
+    ],
+    "value": 547.235033066622,
+    "metric": "Mpts/s",
+    "pct": 98.8
+   },
+   "numpy": null,
+   "counterpart": null
+  },
+  {
+   "repo": "pyspectral",
+   "workload": "spectral 3D",
+   "bound": "FFT",
+   "roofline": "cuFFT time for the step's transforms + pointwise traffic",
+   "dsl": {
+    "backend": "warp",
+    "variant": "fused",
+    "size": [
+     256,
+     256,
+     256
+    ],
+    "value": 247.2528348670289,
+    "metric": "Mpts/s",
+    "pct": 79.6
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "inductor",
+    "size": [
+     256,
+     256,
+     256
+    ],
+    "value": 198.0556116757523,
+    "metric": "Mpts/s",
+    "pct": 63.7
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "fused-inplace-lean",
+    "size": [
+     384,
+     384,
+     384
+    ],
+    "value": 310.36443357869547,
+    "metric": "Mpts/s",
+    "pct": 102.5
+   },
+   "numpy": null,
+   "counterpart": null
+  },
+  {
+   "repo": "pyising",
+   "workload": "Ising 2D",
+   "bound": "memory/RNG",
+   "roofline": "min(copy bandwidth, Philox throughput) per spin update",
+   "dsl": {
+    "backend": "warp",
+    "variant": "msc",
+    "size": [
+     131072,
+     131072
+    ],
+    "value": 370.279,
+    "metric": "flips/ns",
+    "pct": 38.5
+   },
+   "compile": {
+    "backend": "torch-compile",
+    "variant": "int8",
+    "size": [
+     8192,
+     8192
+    ],
+    "value": 9.595,
+    "metric": "flips/ns",
+    "pct": 8.0
+   },
+   "cuda_c": {
+    "backend": "cupy-cuda-c",
+    "variant": "msc",
+    "size": [
+     131072,
+     131072
+    ],
+    "value": 408.825,
+    "metric": "flips/ns",
+    "pct": 42.5
+   },
+   "numpy": {
+    "backend": "numpy",
+    "variant": "int8",
+    "size": [
+     1024,
+     1024
+    ],
+    "value": 0.049,
+    "metric": "flips/ns",
+    "pct": 0.0
+   },
+   "counterpart": null
+  }
+ ]
+}
