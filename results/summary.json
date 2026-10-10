@@ -14,28 +14,34 @@
  "sources": {
   "pylbm": {
    "file": "pylbm/results/rtx3070-laptop.json",
-   "commit": "7ec604d"
+   "commit": "1d1a2d5"
   },
   "pyheat3d": {
    "file": "pyheat3d/results/rtx3070-laptop.json",
-   "commit": "e98f817"
+   "commit": "8399d47"
   },
   "pygravity": {
    "file": "pygravity/results/rtx3070-laptop.json",
-   "commit": "1ffed51"
+   "commit": "1dbd2fc"
   },
   "pymd": {
    "file": "pymd/results/rtx3070-laptop.json",
-   "commit": "4c32133"
+   "commit": "e99eb7c"
   },
   "pyspectral": {
    "file": "pyspectral/results/rtx3070-laptop.json",
-   "commit": "3a4c6a0"
+   "commit": "2f75e85"
   },
   "pyising": {
    "file": "pyising/results/rtx3070-laptop.json",
-   "commit": "115ae4c"
+   "commit": "5f05169"
   }
+ },
+ "ceilings": {
+  "copy_bandwidth_GBs": 361.0,
+  "spec_bandwidth_GBs": 448.0,
+  "fp32_fma_tflops": 15.491450101875472,
+  "philox_calls_per_ns": 112.57
  },
  "workloads": [
   {
@@ -77,7 +83,28 @@
     "pct": 100.3
    },
    "numpy": null,
-   "counterpart": null
+   "counterparts": [
+    {
+     "code": "FluidX3D",
+     "variant": "FP32/FP32",
+     "pct": 98.7,
+     "size": [
+      4096,
+      4096
+     ],
+     "conversion": "direct"
+    },
+    {
+     "code": "Lettuce",
+     "variant": "native CUDA",
+     "pct": 27.1,
+     "size": [
+      4096,
+      4096
+     ],
+     "conversion": "direct"
+    }
+   ]
   },
   {
    "repo": "pylbm",
@@ -121,7 +148,30 @@
     "pct": 99.3
    },
    "numpy": null,
-   "counterpart": null
+   "counterparts": [
+    {
+     "code": "FluidX3D",
+     "variant": "FP32/FP32",
+     "pct": 99.1,
+     "size": [
+      256,
+      256,
+      256
+     ],
+     "conversion": "direct"
+    },
+    {
+     "code": "Lettuce",
+     "variant": "native CUDA",
+     "pct": 13.6,
+     "size": [
+      192,
+      192,
+      192
+     ],
+     "conversion": "direct"
+    }
+   ]
   },
   {
    "repo": "pyheat3d",
@@ -172,7 +222,18 @@
     "metric": "MLUPS",
     "pct": 1.1
    },
-   "counterpart": null
+   "counterparts": [
+    {
+     "code": "pystencils",
+     "variant": "tuned",
+     "pct": 98.8,
+     "size": [
+      16384,
+      16384
+     ],
+     "conversion": "direct"
+    }
+   ]
   },
   {
    "repo": "pyheat3d",
@@ -227,7 +288,19 @@
     "metric": "MLUPS",
     "pct": 0.6
    },
-   "counterpart": null
+   "counterparts": [
+    {
+     "code": "pystencils",
+     "variant": "tuned",
+     "pct": 72.6,
+     "size": [
+      512,
+      512,
+      512
+     ],
+     "conversion": "direct"
+    }
+   ]
   },
   {
    "repo": "pygravity",
@@ -274,7 +347,17 @@
     "metric": "Ginteractions/s",
     "pct": 0.0
    },
-   "counterpart": null
+   "counterparts": [
+    {
+     "code": "CUDA Samples nbody",
+     "variant": "fast-math",
+     "pct": 47.3,
+     "size": [
+      262144
+     ],
+     "conversion": "direct"
+    }
+   ]
   },
   {
    "repo": "pymd",
@@ -321,7 +404,41 @@
     "metric": "atom-steps/s",
     "pct": 0.0
    },
-   "counterpart": null
+   "counterparts": [
+    {
+     "code": "HOOMD-blue",
+     "variant": "gpu-single",
+     "pct": 34.4,
+     "size": [
+      1048576
+     ],
+     "conversion": "ratio",
+     "rate": 359318155.06837267,
+     "tuning_complete": true
+    },
+    {
+     "code": "LAMMPS",
+     "variant": "kokkos-single-half",
+     "pct": 12.0,
+     "size": [
+      1048576
+     ],
+     "conversion": "ratio",
+     "rate": 125532674.58895817,
+     "tuning_complete": null
+    },
+    {
+     "code": "LAMMPS",
+     "variant": "kokkos-single",
+     "pct": 11.8,
+     "size": [
+      256000
+     ],
+     "conversion": "ratio",
+     "rate": 122921679.90500163,
+     "tuning_complete": null
+    }
+   ]
   },
   {
    "repo": "pyspectral",
@@ -362,7 +479,26 @@
     "pct": 98.8
    },
    "numpy": null,
-   "counterpart": null
+   "counterparts": [
+    {
+     "code": "JAX-CFD",
+     "variant": "if-rk4",
+     "pct": 51.8,
+     "size": [
+      8192
+     ],
+     "conversion": "ratio (time per step)"
+    },
+    {
+     "code": "JAX-CFD",
+     "variant": "cn-rk4",
+     "pct": 40.2,
+     "size": [
+      8192
+     ],
+     "conversion": "ratio (time per step)"
+    }
+   ]
   },
   {
    "repo": "pyspectral",
@@ -406,7 +542,7 @@
     "pct": 102.5
    },
    "numpy": null,
-   "counterpart": null
+   "counterparts": []
   },
   {
    "repo": "pyising",
@@ -457,7 +593,54 @@
     "metric": "flips/ns",
     "pct": 0.0
    },
-   "counterpart": null
+   "counterparts": [
+    {
+     "code": "NVIDIA ising-gpu",
+     "variant": "cuIsingModel",
+     "pct": 28.7,
+     "size": [
+      16384
+     ],
+     "conversion": "ratio",
+     "rate": 273.66
+    },
+    {
+     "code": "NVIDIA ising-gpu",
+     "variant": "optimized_old",
+     "pct": 18.4,
+     "size": [
+      32768
+     ],
+     "conversion": "ratio",
+     "rate": 176.81
+    }
+   ]
   }
- ]
+ ],
+ "temporal_blocking": {
+  "2D": {
+   "ours": {
+    "variant": "cupy-cuda-c/tb8",
+    "k": 8,
+    "x_roof": 3.622937905757142
+   },
+   "an5d": {
+    "variant": "star2d1r-512-13-256",
+    "k": 13,
+    "x_roof": 5.2435916157275715
+   }
+  },
+  "3D": {
+   "ours": {
+    "variant": "cupy-cuda-c/tb3",
+    "k": 3,
+    "x_roof": 2.0896186701848283
+   },
+   "an5d": {
+    "variant": "star3d1r-32x32-4-128",
+    "k": 4,
+    "x_roof": 1.5907203348124155
+   }
+  }
+ }
 }

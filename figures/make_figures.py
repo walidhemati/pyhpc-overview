@@ -1,0 +1,143 @@
+"""results/summary.json -> figures/efficiency.{pdf,png} and paper/results.tex.
+
+    ~/.venvs/pyhpc/bin/python collect.py && ~/.venvs/pyhpc/bin/python figures/make_figures.py
+"""
+
+from __future__ import annotations
+
+import json
+import statistics
+from pathlib import Path
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[1]
+plt.rcParams.update({"font.family": "serif", "font.size": 9, "axes.spines.top": False,
+                     "axes.spines.right": False, "figure.dpi": 150, "savefig.bbox": "tight"})
+COLORS = {"numpy": "#7f7f7f", "torch-eager": "#9467bd", "torch-compile": "#8c564b",
+          "triton": "#1f77b4", "warp": "#2ca02c", "numba": "#ff7f0e", "cupy-cuda-c": "#d62728"}
+LABEL = {"triton": "Triton", "warp": "Warp", "numba": "Numba-CUDA", "cupy-cuda-c": "CUDA C",
+         "torch-compile": "torch.compile"}
+TAG = {"LBM D2Q9": "LbmTwo", "LBM D3Q19": "LbmThree", "heat 2D": "HeatTwo",
+       "heat 3D": "HeatThree", "N-body": "Nbody", "LJ MD": "Md", "spectral 2D": "SpecTwo",
+       "spectral 3D": "SpecThree", "Ising 2D": "Ising"}
+
+
+def fmt(x: float, nd: int = 0) -> str:
+    return f"{x:.{nd}f}"
+
+
+def figure(w: list[dict]) -> None:
+    fig, ax = plt.subplots(figsize=(7.0, 3.6))
+    n = len(w)
+    width = 0.16
+    for i, item in enumerate(w):
+        bars = [("compile", item.get("compile")), ("dsl", item.get("dsl")),
+                ("cuda_c", item.get("cuda_c"))]
+        x0 = i - 1.5 * width
+        for j, (_, r) in enumerate(bars):
+            if r is None:
+                continue
+            ax.bar(x0 + j * width, r["pct"], width, color=COLORS[r["backend"]],
+                   edgecolor="none")
+        cps = item.get("counterparts") or []
+        if cps:
+            top = max(cps, key=lambda c: c["pct"])
+            ax.bar(x0 + 3 * width, top["pct"], width, color="black", edgecolor="none")
+            ax.text(x0 + 3 * width, top["pct"] + 2, top["code"].replace("NVIDIA ", "")
+                    .replace("CUDA Samples ", ""), rotation=90, ha="center", va="bottom",
+                    fontsize=6)
+    ax.axhline(100, ls="--", color="0.3", lw=0.8)
+    ax.set_xticks(range(n))
+    ax.set_xticklabels([item["workload"].replace(" ", "\n") for item in w], fontsize=7.5)
+    ax.set_ylabel("% of the workload's roofline")
+    ax.set_ylim(0, 125)
+
+    def patch(c: str) -> plt.Rectangle:
+        return plt.Rectangle((0, 0), 1, 1, color=c)
+
+    handles = [patch(COLORS["torch-compile"]), patch(COLORS["triton"]), patch(COLORS["warp"]),
+               patch(COLORS["numba"]), patch(COLORS["cupy-cuda-c"]), patch("black")]
+    ax.legend(handles, ["torch.compile", "Triton", "Warp", "Numba-CUDA",
+                        "hand-written CUDA C", "best established code"],
+              loc="upper center", bbox_to_anchor=(0.5, -0.16), fontsize=7, ncol=6,
+              frameon=False, handlelength=1.2, columnspacing=1.2)
+    (ROOT / "figures").mkdir(exist_ok=True)
+    for ext in ("pdf", "png"):
+        fig.savefig(ROOT / "figures" / f"efficiency.{ext}")
+    plt.close(fig)
+
+
+def results_tex(doc: dict) -> None:
+    w = doc["workloads"]
+    c = doc["ceilings"]
+    m: dict[str, str] = {"gpuName": doc["machine"]["gpu"], "nWorkloads": str(len(w)),
+                         "copyBW": fmt(c["copy_bandwidth_GBs"]),
+                         "specBW": fmt(c["spec_bandwidth_GBs"]),
+                         "fmaPeak": fmt(c["fp32_fma_tflops"], 1),
+                         "philoxRate": fmt(c["philox_calls_per_ns"], 1)}
+    ratios = []
+    for item in w:
+        t = TAG[item["workload"]]
+        for k, name in (("dsl", "Dsl"), ("compile", "Compile"), ("cuda_c", "Cuda")):
+            r = item.get(k)
+            if r:
+                m[f"{t}{name}Pct"] = fmt(r["pct"])
+                m[f"{t}{name}Backend"] = LABEL.get(r["backend"], r["backend"])
+        if item.get("dsl") and item.get("cuda_c"):
+            q = 100 * item["dsl"]["pct"] / item["cuda_c"]["pct"]
+            ratios.append(q)
+            m[f"{t}DslOverCuda"] = fmt(q)
+        cps = item.get("counterparts") or []
+        if cps:
+            top = max(cps, key=lambda c: c["pct"])
+            m[f"{t}CpPct"] = fmt(top["pct"])
+            m[f"{t}CpCode"] = top["code"]
+            if item.get("dsl"):
+                m[f"{t}DslOverCp"] = fmt(item["dsl"]["pct"] / top["pct"], 2)
+            if item.get("cuda_c"):
+                m[f"{t}CudaOverCp"] = fmt(item["cuda_c"]["pct"] / top["pct"], 2)
+    for d, tag in (("2D", "Two"), ("3D", "Three")):
+        tb = doc.get("temporal_blocking", {}).get(d)
+        if tb:
+            m[f"tb{tag}OursX"] = fmt(tb["ours"]["x_roof"], 2)
+            m[f"tb{tag}OursK"] = str(tb["ours"]["k"])
+            m[f"tb{tag}AnX"] = fmt(tb["an5d"]["x_roof"], 2)
+            m[f"tb{tag}AnK"] = str(tb["an5d"]["k"])
+    m["dslOverCudaMin"] = fmt(min(ratios))
+    m["dslOverCudaMax"] = fmt(max(ratios))
+    m["dslOverCudaMedian"] = fmt(statistics.median(ratios))
+    lines = ["% GENERATED by figures/make_figures.py from results/summary.json -- do not edit."]
+    lines += [rf"\newcommand{{\{k}}}{{{v}}}" for k, v in m.items()]
+    rows = []
+    for item in w:
+        cells = []
+        for k in ("compile", "dsl", "cuda_c"):
+            r = item.get(k)
+            cells.append(fmt(r["pct"]) if r else "--")
+        best_per_code: dict[str, dict] = {}
+        for c in sorted(item.get("counterparts") or [], key=lambda c: -c["pct"]):
+            best_per_code.setdefault(c["code"], c)
+        cps = list(best_per_code.values())
+        cp = "; ".join(f"{c['code']} {fmt(c['pct'])}" for c in cps[:2]) or "--"
+        dsl = item.get("dsl")
+        rows.append(f"{item['workload']} & {item['bound']} & {cells[0]} & {cells[1]}"
+                    f"{' (' + LABEL[dsl['backend']] + ')' if dsl else ''} & {cells[2]} & "
+                    f"{cp} \\\\")
+    lines.append(r"\newcommand{\summaryRows}{" + "\n".join(rows) + "}")
+    (ROOT / "paper").mkdir(exist_ok=True)
+    (ROOT / "paper" / "results.tex").write_text("\n".join(lines) + "\n")
+
+
+def main() -> None:
+    doc = json.loads((ROOT / "results" / "summary.json").read_text())
+    figure(doc["workloads"])
+    results_tex(doc)
+    print("figures/efficiency.{pdf,png}, paper/results.tex")
+
+
+if __name__ == "__main__":
+    main()
